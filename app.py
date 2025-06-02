@@ -80,6 +80,8 @@ TI_QUESTIONS_INDICES_APP = list(range(23, 33))
 # --- Credenciais do Administrador (NÃO FAÇA ISSO EM PRODUÇÃO REAL - use variáveis de ambiente ou config) ---
 # ADMIN_USERNAME = "admin"
 # ADMIN_PASSWORD = "adm123" # Mude isso para uma senha forte!
+# ADMIN_USERNAME = "admin"
+# ADMIN_PASSWORD = "adm123" # Mude isso para uma senha forte!
 
 # NODE_API_BASE_URL = "https://apicursos.glitch.me"
 
