@@ -18,14 +18,17 @@ import random
 import requests
 
 app = Flask(__name__)
-app.secret_key = 'Teste321' # MUITO IMPORTANTE: Mude isso para uma chave secreta forte e aleatória!
+# app.secret_key = 'Teste321' # MUITO IMPORTANTE: Mude isso para uma chave secreta forte e aleatória!
+BASE_DATA_PATH = os.getenv('DATA_DIR_PATH', '.')
+app.secret_key = os.getenv('SECRET_KEY', 'Teste321')
 
 # --- Configurações e Constantes (como antes) ---
-CSV_FILE_PATH = 'completo.csv'
-METRICS_FILE_PATH = 'ai_metrics.json'
-SCALER_PATH = 'scaler.joblib'
-LABEL_ENCODER_PATH = 'label_encoder.joblib'
-MODEL_SAVE_PATH = "modelo_area_interesse.keras"
+CSV_FILE_PATH = os.path.join(BASE_DATA_PATH, 'completo.csv')
+METRICS_FILE_PATH = os.path.join(BASE_DATA_PATH, 'ai_metrics.json')
+SCALER_PATH = os.path.join(BASE_DATA_PATH, 'scaler.joblib')
+LABEL_ENCODER_PATH = os.path.join(BASE_DATA_PATH, 'label_encoder.joblib')
+MODEL_SAVE_PATH = os.path.join(BASE_DATA_PATH, "modelo_area_interesse.keras")
+TRAINING_IN_PROGRESS_FLAG = os.path.join(BASE_DATA_PATH, "training_lock.tmp")
 
 interest_to_weight = {1: 0.1, 2: 0.3, 3: 0.5, 4: 0.7, 5: 0.9}
 answer_value_to_string = {
@@ -75,10 +78,17 @@ SAUDE_QUESTIONS_INDICES_APP = list(range(13, 23))
 TI_QUESTIONS_INDICES_APP = list(range(23, 33))
 
 # --- Credenciais do Administrador (NÃO FAÇA ISSO EM PRODUÇÃO REAL - use variáveis de ambiente ou config) ---
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "adm123" # Mude isso para uma senha forte!
+# ADMIN_USERNAME = "admin"
+# ADMIN_PASSWORD = "adm123" # Mude isso para uma senha forte!
 
-NODE_API_BASE_URL = "https://apicursos.glitch.me"
+# NODE_API_BASE_URL = "https://apicursos.glitch.me"
+
+ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', "admin")
+ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', "adm123")
+
+# Para a URL da API Node no app.py:
+NODE_API_BASE_URL = os.getenv('NODE_API_BASE_URL', "https://apicursos.glitch.me")
+
 
 def extract_score_from_answer(answer_str):
     if pd.isna(answer_str) or not isinstance(answer_str, str): return None
