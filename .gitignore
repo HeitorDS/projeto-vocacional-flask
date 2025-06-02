@@ -1,0 +1,47 @@
+# Arquivos de ambiente virtual Python
+venv/
+*.venv/
+env/
+ENV/
+*/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Arquivos de configuração de IDEs
+.vscode/
+.idea/
+*.DS_Store
+
+# Arquivos de dependências do Node (se você tivesse Node no mesmo repo, não é o caso aqui)
+# node_modules/
+
+# Logs e arquivos temporários
+*.log
+*.tmp
+training_lock.tmp # Seu arquivo de lock do treinamento
+
+# Arquivos de artefatos de ML que são gerados (se você não quiser versioná-los)
+# Você PODE querer versionar o modelo inicial, scaler, etc., se fizerem parte do "estado inicial"
+# Mas se eles são constantemente regenerados, talvez não. Por enquanto, vamos ignorá-los,
+# já que são gerados pelo script de treinamento.
+scaler.joblib
+label_encoder.joblib
+modelo_area_interesse.keras
+ai_metrics.json # Se você quer que o GitHub tenha o estado inicial, comente esta linha
+
+# Arquivos CSV de dados (considere se quer versionar o CSV inicial ou não)
+# Se o CSV é grande e muda constantemente, pode não ser ideal para o Git.
+# Se é um dataset inicial pequeno, pode ser OK.
+# Por enquanto, vamos supor que você quer uma cópia inicial dele no repo:
+# completo.csv # Comente esta linha se NÃO quiser versionar o CSV
+
+# Arquivos específicos do sistema operacional
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Arquivos de build/distribuição (se aplicável)
+dist/
+build/
+*.egg-info/

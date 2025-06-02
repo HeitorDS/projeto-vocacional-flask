@@ -1,0 +1,9 @@
+Flask
+pandas
+numpy
+scikit-learn
+tensorflow
+watchdog
+requests
+joblib
+gunicorn  # Servidor de aplicação WSGI para produção

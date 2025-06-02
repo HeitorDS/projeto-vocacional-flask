@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHV | Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+</head>
+
+<body>
+    <header>
+        <h1>
+            <p>PHV</p> Sistemas e Tecnologias
+        </h1>
+        <nav>
+            <ul>
+                <li><a href="/about">Sobre a empresa</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <h2>Orientação Profissional</h2>
+            <p>Descubra a sua aptidão com base nos seus interesses</p>
+            <a href="/questionnaire">Descobrir Aptidão</a>
+        </div>
+    </main>
+    <footer>&copy; <b>PHV</b> - Todos os direitos reservados</footer>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>

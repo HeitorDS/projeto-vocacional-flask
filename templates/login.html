@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login do Administrador</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {# Você pode adicionar um CSS específico para login.html se desejar mais customização #}
+    {# <link rel="stylesheet" href="{{ url_for('static', filename='login_page.css') }}"> #}
+    <style>
+        /* Estilos básicos que podem ser movidos para um login_page.css */
+        .login-page-container { max-width: 400px; margin: 50px auto; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        .login-page-container h1 { text-align: center; margin-bottom: 25px; }
+        .login-form-group { margin-bottom: 20px; }
+        .login-form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
+        .login-form-group input[type="text"], .login-form-group input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .login-page-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 0;
+            width: 100%;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        .login-page-btn:hover { background-color: #0056b3; }
+        .flash-messages { list-style-type: none; padding: 0; margin-bottom: 20px; }
+        .flash-messages li { padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+        .flash-messages li.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-messages li.danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .flash-messages li.info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .guest-link { display: block; text-align: center; margin-top: 20px; color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="login-page-container">
+        <h1>Login do Administrador</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('show_login_form') }}">
+            <div class="login-form-group">
+                <label for="username">Usuário:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="login-form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="login-page-btn">Entrar</button>
+        </form>
+        <a href="{{ url_for('show_questionnaire_form') }}" class="guest-link">Continuar como visitante (Responder Questionário)</a>
+    </div>
+</body>
+</html>

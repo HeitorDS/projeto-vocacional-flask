@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sua Recomendação Vocacional</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='prediction_style.css') }}"> {# CSS específico desta página #}
+</head>
+<body>
+    <div class="container">
+        <div class="result-container">
+            <h1>Sua Recomendação Personalizada</h1>
+            {% if error %}
+                <p class="error-message">{{ error }}</p>
+            {% elif name and recommended_area %}
+                <p class="result-message">Olá, <strong>{{ name }}</strong>!</p>
+                <p>Com base nas suas respostas, a área mais alinhada com seus interesses é:</p>
+                <p class="recommended-area-display area-{{ recommended_area.split(' (')[0]|lower|replace(' ', '-') }}">{{ recommended_area }}</p>
+            {% else %}
+                 <p class="result-message">Não foi possível gerar uma recomendação no momento.</p>
+            {% endif %}
+
+            {% if courses and not error %} {# Só mostra cursos recomendados se não houver erro geral #}
+            <div class="courses-section">
+                <h3>Cursos Sugeridos na Área Recomendada:</h3>
+                <ul class="course-list" id="recommendedCoursesList">
+                    {% for course in courses %}
+                    <li class="course-item">
+                        <h4>{{ course.nome }}</h4>
+                        <p>{{ course.descricao }}</p>
+                    </li>
+                    {% else %}
+                    <li>Nenhum curso encontrado para esta área no momento.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% elif not error %}
+            <div class="courses-section">
+                <p>Não foi possível carregar cursos para a área recomendada no momento.</p>
+            </div>
+            {% endif %}
+
+            <div class="other-courses-control">
+                <hr style="margin: 30px 0;">
+                <h3>Explorar Cursos de Outras Áreas</h3>
+                <label for="areaSelector">Selecione uma área:</label>
+                <select id="areaSelector">
+                    <option value="">-- Escolha uma área --</option>
+                    <option value="TI">TI (Tecnologia da Informação)</option>
+                    <option value="Saúde">Saúde</option>
+                    <option value="Gestão">Gestão</option>
+                </select>
+                <button id="loadOtherCoursesBtn">Ver Cursos</button>
+            </div>
+
+            <div id="otherCoursesDisplay" class="courses-section" style="display: none;">
+                <h3 id="otherCoursesTitle"></h3>
+                <p id="loadingOtherCourses" class="loading-message" style="display:none;">Carregando cursos...</p>
+                <ul class="course-list" id="otherCoursesList">
+                    {# Cursos carregados por JS irão aqui #}
+                </ul>
+                <p id="noOtherCoursesMessage" style="display:none;">Nenhum curso encontrado para esta área ou erro ao carregar.</p>
+            </div>
+
+            <p class="note">Lembre-se que esta é uma sugestão baseada nos dados fornecidos. Seus dados foram adicionados ao nosso sistema e ajudarão a refinar futuras recomendações da IA.</p>
+            <a href="{{ url_for('show_questionnaire_form') }}" class="back-link" style="margin-left: 10px;">Responder Novamente</a>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='prediction_scripts.js') }}"></script> {# JavaScript específico desta página #}
+</body>
+</html>
