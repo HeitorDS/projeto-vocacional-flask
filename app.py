@@ -18,7 +18,7 @@ import random
 import requests
 
 app = Flask(__name__)
-app.secret_key = 'Teste321' # MUITO IMPORTANTE: Mude isso para uma chave secreta forte e aleatória!
+# app.secret_key = 'Teste321' # MUITO IMPORTANTE: Mude isso para uma chave secreta forte e aleatória!
 
 # --- Configurações e Constantes (como antes) ---
 CSV_FILE_PATH = 'completo.csv'
@@ -75,10 +75,10 @@ SAUDE_QUESTIONS_INDICES_APP = list(range(13, 23))
 TI_QUESTIONS_INDICES_APP = list(range(23, 33))
 
 # --- Credenciais do Administrador (NÃO FAÇA ISSO EM PRODUÇÃO REAL - use variáveis de ambiente ou config) ---
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "adm123" # Mude isso para uma senha forte!
+# ADMIN_USERNAME = "admin"
+# ADMIN_PASSWORD = "adm123" # Mude isso para uma senha forte!
 
-NODE_API_BASE_URL = "https://apicursos.glitch.me"
+# NODE_API_BASE_URL = "https://apicursos.glitch.me"
 
 def extract_score_from_answer(answer_str):
     if pd.isna(answer_str) or not isinstance(answer_str, str): return None
