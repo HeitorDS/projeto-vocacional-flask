@@ -1,38 +1,35 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PHV | Home</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
 </head>
-
 <body>
     <header>
-        <h1>
-            PHV Sistemas e Tecnologias
-        </h1>
+        <h1>PHV Sistemas e Tecnologias</h1>
         <nav>
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">Sobre a Empresa</a></li>
-                <li><a href="/redirect">Login Adm</a></li>
+                <li><a href="{{ url_for('landing') }}">Home</a></li>
+                <li><a href="{{ url_for('about') }}">Sobre a Empresa</a></li>
+                {% if admin_logged_in %}
+                    <li><a href="{{ url_for('admin_dashboard') }}">Painel Admin</a></li>
+                    <li><a href="{{ url_for('logout') }}" style="color: #dc3545;">Logout Admin</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('show_login_form') }}">Login Adm</a></li>
+                {% endif %}
             </ul>
         </nav>
-
     </header>
-
     <main>
         <div class="container">
             <h2>Orientação Profissional</h2>
             <p>Descubra a sua aptidão com base nos seus interesses</p>
             <a href="/questionnaire">Descobrir Aptidão</a>
         </div>
-
     </main>
-    <footer>&copy; <b>PHV</b> - Todos os direitos reservados</footer>
+    <footer>&copy; <b>2025, PHV</b> - Todos os direitos reservados</footer>
     <script src="{{ url_for('static', filename='modal_login.js') }}"></script> {# JavaScript para o modal #}
 </body>
-
 </html>

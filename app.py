@@ -77,20 +77,10 @@ GESTÃO_QUESTIONS_INDICES_APP = list(range(3, 13))
 SAUDE_QUESTIONS_INDICES_APP = list(range(13, 23))
 TI_QUESTIONS_INDICES_APP = list(range(23, 33))
 
-# --- Credenciais do Administrador (NÃO FAÇA ISSO EM PRODUÇÃO REAL - use variáveis de ambiente ou config) ---
-# ADMIN_USERNAME = "admin"
-# ADMIN_PASSWORD = "adm123" # Mude isso para uma senha forte!
-# ADMIN_USERNAME = "admin"
-# ADMIN_PASSWORD = "adm123" # Mude isso para uma senha forte!
-
-# NODE_API_BASE_URL = "https://apicursos.glitch.me"
-
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', "admin")
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', "adm123")
 
-# Para a URL da API Node no app.py:
 NODE_API_BASE_URL = os.getenv('NODE_API_BASE_URL', "https://api-cursos-taupe.vercel.app")
-
 
 def extract_score_from_answer(answer_str):
     if pd.isna(answer_str) or not isinstance(answer_str, str): return None
@@ -146,9 +136,32 @@ def load_ai_metrics():
             return 0.0, 0.0, "Ainda não treinado"
         with open(METRICS_FILE_PATH, 'r') as f:
             metrics = json.load(f)
-            return metrics.get("accuracy_test", 0.0), metrics.get("loss_test", 0.0), metrics.get("last_trained_timestamp", "N/A")
-    except json.JSONDecodeError: return 0.0, 0.0, "Erro no arquivo de métricas"
-    except Exception: return 0.0, 0.0, "Erro ao carregar métricas"
+            accuracy = metrics.get("accuracy_test", 0.0)
+            loss = metrics.get("loss_test", 0.0)
+            timestamp_iso = metrics.get("last_trained_timestamp", None)
+
+            formatted_timestamp = "N/A"
+            if timestamp_iso:
+                try:
+                    dt_object = datetime.fromisoformat(timestamp_iso)
+                    formatted_timestamp = dt_object.strftime("No dia %d/%m/%Y às %H:%M:%S")
+                except ValueError:
+                    formatted_timestamp = "Timestamp inválido"
+                    print(f"AVISO: Timestamp '{timestamp_iso}' em {METRICS_FILE_PATH} não é um formato ISO válido.")
+                except Exception as e:
+                    formatted_timestamp = "Erro ao formatar timestamp"
+                    print(f"ERRO ao formatar timestamp '{timestamp_iso}': {e}")
+            
+            return accuracy, loss, formatted_timestamp
+    except json.JSONDecodeError:
+        print(f"Erro ao decodificar JSON de {METRICS_FILE_PATH}. Retornando defaults.")
+        return 0.0, 0.0, "Erro no arquivo de métricas"
+    except FileNotFoundError:
+        print(f"Arquivo de métricas {METRICS_FILE_PATH} não encontrado. Retornando defaults.")
+        return 0.0, 0.0, "Ainda não treinado"
+    except Exception as e:
+        print(f"Erro desconhecido ao carregar métricas: {e}. Retornando defaults.")
+        return 0.0, 0.0, "Erro ao carregar métricas"
 
 def fetch_courses_from_api(area_endpoint_segment):
     """Busca cursos de uma área específica da API Node.js."""
@@ -156,7 +169,6 @@ def fetch_courses_from_api(area_endpoint_segment):
         print("Segmento do endpoint da área está vazio, não buscando cursos.")
         return []
     try:
-        # Garante que o segmento esteja em minúsculas, como esperado pela API Node.js
         api_url = f"{NODE_API_BASE_URL}/{area_endpoint_segment.lower()}"
         print(f"Buscando cursos de: {api_url}")
         response = requests.get(api_url, timeout=10)
@@ -176,9 +188,9 @@ def fetch_courses_from_api(area_endpoint_segment):
     except requests.exceptions.RequestException as e:
         print(f"Erro genérico ao buscar cursos da API para '{area_endpoint_segment}' em {api_url}: {e}")
         return []
-    except json.JSONDecodeError as json_err: # Se a resposta não for JSON válido
+    except json.JSONDecodeError as json_err:
         print(f"Erro ao decodificar JSON da API para '{area_endpoint_segment}' em {api_url}: {json_err}")
-        print(f"Conteúdo da resposta que causou o erro: {response.text[:500]}...") # Mostra parte da resposta
+        print(f"Conteúdo da resposta que causou o erro: {response.text[:500]}...")
         return []
 
 TRAINING_IN_PROGRESS_FLAG = "training_lock.tmp"
@@ -230,30 +242,31 @@ def start_file_monitor():
     observer.join()
     print("Monitor de arquivo interrompido.")
 
-# --- ROTAS DO FLASK ---
-@app.route('/about')
-def about():
-    return render_template('about.html')
-    
+@app.context_processor
+def inject_user_status():
+    return dict(admin_logged_in=session.get('logged_in_admin', False))
+
 @app.route('/')
 def landing():
     return render_template('landing.html')
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
-@app.route('/redirect')
-def index():
+@app.route('/admin_dashboard')
+def admin_dashboard():
     if not session.get('logged_in_admin'):
-        # Se não estiver logado como admin, redireciona para o login
-        # Ou, como solicitado, para o questionário se o login falhar/não for tentado
-        return redirect(url_for('show_login_form')) # Ou url_for('show_questionnaire_form')
+        flash('Por favor, faça login para acessar o painel de administrador.', 'warning')
+        return redirect(url_for('show_login_form'))
     
-    # Se chegou aqui, é admin
     survey_results = process_survey_data()
     ai_accuracy, ai_loss, last_trained = load_ai_metrics()
     nome_arquivo_grafico = 'grafico_acuracia_perda_modelo.png'
     grafico_modelo_url = None
     if os.path.exists(os.path.join(app.static_folder, nome_arquivo_grafico)):
         grafico_modelo_url = url_for('static', filename=nome_arquivo_grafico)
+    
     return render_template('index.html',
                            results=survey_results,
                            ai_accuracy=ai_accuracy,
@@ -263,37 +276,32 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def show_login_form():
+    if session.get('logged_in_admin'):
+        return redirect(url_for('admin_dashboard'))
+
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['logged_in_admin'] = True
             flash('Login bem-sucedido como administrador!', 'success')
-            return redirect(url_for('index'))
+            return redirect(url_for('admin_dashboard'))
         else:
-            flash('Nome de usuário ou senha inválidos.', 'danger')  
-            # Se o login falhar, permanece na página de login ou redireciona para o questionário
-            return redirect(url_for('show_login_form')) # Ou redirect(url_for('show_questionnaire_form'))
-    
-    # Se for GET, ou se o POST falhou e redirecionou para cá
-    # Se o usuário já estiver logado como admin, redireciona para o index
-    if session.get('logged_in_admin'):
-        return redirect(url_for('index'))
-    
-    # Se não estiver logado, mostra o formulário de login
-    # (ou redireciona para o questionário se essa for a política para acesso não autenticado)
-    # Vamos criar um template de login simples
-    return render_template('login.html') # Você precisará criar login.html
+            flash('Nome de usuário ou senha inválidos.', 'danger')
+            return redirect(url_for('show_login_form')) 
+    return render_template('login.html')
 
 @app.route('/logout')
 def logout():
     session.pop('logged_in_admin', None)
     flash('Você foi desconectado.', 'info')
-    return redirect(url_for('show_login_form')) # Redireciona para a página de login após logout
+    return redirect(url_for('landing'))
 
 @app.route('/questionnaire', methods=['GET'])
 def show_questionnaire_form():
-    # ... (lógica de embaralhar perguntas como antes) ...
+    if session.get('logged_in_admin'):
+        return redirect(url_for('admin_dashboard'))
+
     questions_with_indices = []
     for i, text in enumerate(ORIGINAL_QUESTION_TEXTS):
         questions_with_indices.append({"id": f"q_orig_{i}", "text": text, "original_index": i})
@@ -302,8 +310,11 @@ def show_questionnaire_form():
 
 @app.route('/submit_questionnaire', methods=['POST'])
 def submit_questionnaire():
+    if session.get('logged_in_admin'):
+        flash('Administradores não podem submeter o questionário.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+
     user_name_for_template = request.form.get('nome', 'Anônimo')
-    # ... (coleta de respostas como antes) ...
     try:
         idade = request.form.get('idade', '0')
         answers_numeric = []
@@ -334,114 +345,87 @@ def submit_questionnaire():
                     writer.writerow(header)
                 writer.writerow(new_row_data)
             print(f"Nova resposta (ordenada) de {user_name_for_template} adicionada ao {CSV_FILE_PATH}")
-
-        user_features_weighted = np.array([interest_to_weight.get(ans, 0.0) for ans in answers_numeric]).reshape(1, -1)
         
-        # Inicializa variáveis
-        predicted_area_label_for_display = "Não foi possível determinar a área." # O que será mostrado ao usuário
-        area_for_api_call = None # A chave "limpa" para a API (TI, Saúde, Gestão)
+        user_features_weighted = np.array([interest_to_weight.get(ans, 0.0) for ans in answers_numeric]).reshape(1, -1)
+        predicted_area_label_for_display = "Não foi possível determinar a área."
+        area_for_api_call = None
         recommended_courses = []
-        api_area_map = {"TI": "ti", "Saúde": "saude", "Gestão": "gestao"} # Mapa para endpoint da API Node
+        api_area_map = {"TI": "ti", "Saúde": "saude", "Gestão": "gestao"}
 
         try:
             print(f"\n--- Iniciando Predição IA para: {user_name_for_template} ---")
-            # ... (prints de depuração para existência de arquivos) ...
-            print(f"SCALER_PATH existe: {os.path.exists(SCALER_PATH)}")
-            print(f"LABEL_ENCODER_PATH existe: {os.path.exists(LABEL_ENCODER_PATH)}")
-            print(f"MODEL_SAVE_PATH existe: {os.path.exists(MODEL_SAVE_PATH)}")
+            print(f"DEBUG: SCALER_PATH existe: {os.path.exists(SCALER_PATH)}")
+            print(f"DEBUG: LABEL_ENCODER_PATH existe: {os.path.exists(LABEL_ENCODER_PATH)}")
+            print(f"DEBUG: MODEL_SAVE_PATH existe: {os.path.exists(MODEL_SAVE_PATH)}")
 
             if os.path.exists(SCALER_PATH) and os.path.exists(LABEL_ENCODER_PATH) and os.path.exists(MODEL_SAVE_PATH):
-                # ... (carregar scaler, label_encoder, model) ...
                 scaler = joblib.load(SCALER_PATH)
                 label_encoder = joblib.load(LABEL_ENCODER_PATH)
                 model = tf.keras.models.load_model(MODEL_SAVE_PATH)
-                
-                print(f"LabelEncoder classes: {label_encoder.classes_ if hasattr(label_encoder, 'classes_') else 'N/A'}")
+                print(f"DEBUG: LabelEncoder classes: {label_encoder.classes_ if hasattr(label_encoder, 'classes_') else 'N/A'}")
                 user_features_scaled = scaler.transform(user_features_weighted)
                 prediction_probs = model.predict(user_features_scaled)
                 predicted_class_index = np.argmax(prediction_probs, axis=1)[0]
-                
                 temp_predicted_area_ia = "Erro IA"
                 if hasattr(label_encoder, 'classes_') and predicted_class_index < len(label_encoder.classes_):
                     temp_predicted_area_ia = label_encoder.inverse_transform([predicted_class_index])[0]
-                
-                predicted_area_label_for_display = temp_predicted_area_ia # Pode ser "TI", "Saúde", "Gestão" ou "Erro IA"
+                predicted_area_label_for_display = temp_predicted_area_ia
                 if temp_predicted_area_ia in api_area_map:
                     area_for_api_call = temp_predicted_area_ia
-                print(f"Predição IA: {predicted_area_label_for_display}, Área para API: {area_for_api_call}")
-
+                print(f"DEBUG: Predição IA: {predicted_area_label_for_display}, Área para API (após IA): {area_for_api_call}")
             else:
-                print(f"Artefatos da IA não encontrados. Usando fallback para {user_name_for_template}.")
-                predicted_area_label_for_display = "Análise Direta" # Marcador inicial para fallback
-        
+                print(f"DEBUG: Artefatos da IA não encontrados. Marcando para fallback para {user_name_for_template}.")
+                predicted_area_label_for_display = "Análise Direta (artefatos IA ausentes)"
         except Exception as e:
             print(f"ERRO DETALHADO durante a predição IA para {user_name_for_template}:")
             traceback.print_exc()
-            predicted_area_label_for_display = "Erro na Predição IA" # Mensagem de erro para o usuário
-            # area_for_api_call permanece None, forçando fallback abaixo se necessário
+            predicted_area_label_for_display = "Erro na Predição IA"
 
-        # Se a predição da IA falhou ou os artefatos não existiam, ou se a área da IA não é mapeável,
-        # tentamos a análise direta para determinar a area_for_api_call.
-        if not area_for_api_call: # Se a IA não deu uma área válida para a API
-            print(f"IA não forneceu área mapeável ('{predicted_area_label_for_display}'), usando análise direta para {user_name_for_template}.")
+        if not area_for_api_call:
+            print(f"DEBUG: IA não forneceu área mapeável ('{predicted_area_label_for_display}'), usando análise direta para {user_name_for_template}.")
             from pandas import Series
             pseudo_pd_series = Series([None, None, None] + answers_for_csv_formatted)
-            GESTÃO_DIRECT_INDICES = list(range(3, 3 + 10))
-            SAUDE_DIRECT_INDICES = list(range(3 + 10, 3 + 20))
-            TI_DIRECT_INDICES = list(range(3 + 20, 3 + 30))
+            GESTÃO_DIRECT_INDICES = list(range(3, 3 + 10)); SAUDE_DIRECT_INDICES = list(range(3 + 10, 3 + 20)); TI_DIRECT_INDICES = list(range(3 + 20, 3 + 30))
             score_g_direct = calculate_area_score(pseudo_pd_series, GESTÃO_DIRECT_INDICES, interest_to_weight)
             score_s_direct = calculate_area_score(pseudo_pd_series, SAUDE_DIRECT_INDICES, interest_to_weight)
             score_t_direct = calculate_area_score(pseudo_pd_series, TI_DIRECT_INDICES, interest_to_weight)
             scores_direct_dict = {"Gestão": score_g_direct, "Saúde": score_s_direct, "TI": score_t_direct}
-
             if any(s > 0 for s in scores_direct_dict.values()):
                 direct_area_label = max(scores_direct_dict, key=scores_direct_dict.get)
-                # Atualiza a área para display e para a chamada da API
                 predicted_area_label_for_display = f"{direct_area_label} (Análise Direta)"
-                if direct_area_label in api_area_map:
-                    area_for_api_call = direct_area_label # Ex: "TI"
-            else:
-                predicted_area_label_for_display = "Área Indefinida (Análise Direta)"
-                area_for_api_call = None # Garante que não tentaremos chamar a API
-            print(f"Resultado da Análise Direta: {predicted_area_label_for_display}, Área para API: {area_for_api_call}")
+                if direct_area_label in api_area_map: area_for_api_call = direct_area_label
+            else: predicted_area_label_for_display = "Área Indefinida (Análise Direta)"
+            print(f"DEBUG: Resultado da Análise Direta: {predicted_area_label_for_display}, Área para API (após fallback): {area_for_api_call}")
 
-        # Agora, com area_for_api_call (seja da IA ou da análise direta), buscamos os cursos
         if area_for_api_call and area_for_api_call in api_area_map:
             endpoint_segment = api_area_map[area_for_api_call]
+            print(f"DEBUG: Chamando fetch_courses_from_api com endpoint_segment: '{endpoint_segment}'")
             recommended_courses = fetch_courses_from_api(endpoint_segment)
-            if not recommended_courses:
-                print(f"Nenhum curso retornado da API para {area_for_api_call} (endpoint: {endpoint_segment}).")
+            if not recommended_courses: print(f"AVISO: Nenhum curso retornado da API para {area_for_api_call} (endpoint: {endpoint_segment}).")
         else:
-            print(f"Nenhuma área válida ('{area_for_api_call}') para buscar cursos na API.")
-            recommended_courses = [] # Garante que é uma lista vazia se não houver área válida
-
-        return render_template('prediction_result.html',
-                               name=user_name_for_template,
-                               recommended_area=predicted_area_label_for_display, # O que é mostrado ao usuário
-                               courses=recommended_courses)
-
+            print(f"AVISO: Nenhuma área válida ('{area_for_api_call}') para buscar cursos na API. `recommended_courses` permanecerá vazio.")
+            recommended_courses = []
+        return render_template('prediction_result.html', name=user_name_for_template, recommended_area=predicted_area_label_for_display, courses=recommended_courses)
     except Exception as e:
-        print(f"ERRO GERAL em submit_questionnaire:")
-        traceback.print_exc()
+        print(f"ERRO GERAL em submit_questionnaire:"); traceback.print_exc()
         return render_template('prediction_result.html', name=user_name_for_template, error=f"Ocorreu um erro crítico ao processar suas respostas.")
+
 
 @app.route('/api/courses/<string:area_name>')
 def api_get_courses_by_area(area_name):
+    print(f"DEBUG: Rota /api/courses chamada com area_name: '{area_name}'")
     api_area_map = {"TI": "ti", "Saúde": "saude", "Gestão": "gestao"}
     endpoint_segment = api_area_map.get(area_name)
-
     if not endpoint_segment:
         clean_area_name = area_name.split(" (")[0]
         endpoint_segment = api_area_map.get(clean_area_name)
-
+        print(f"DEBUG: Tentativa de limpar area_name. Novo endpoint_segment: '{endpoint_segment}' para clean_area_name: '{clean_area_name}'")
     if endpoint_segment:
         courses = fetch_courses_from_api(endpoint_segment)
-        if courses: # Só retorna 200 se tiver cursos
-            return jsonify(courses)
-        else: # Se a API retornou lista vazia ou erro, pode ser um 404 aqui também
-            return jsonify({"error": f"Nenhum curso encontrado ou erro ao buscar para {area_name}"}), 404
-    else:
-        return jsonify({"error": "Área inválida ou não mapeada para API"}), 404
+        if courses: return jsonify(courses)
+        else: return jsonify({"error": f"Nenhum curso encontrado ou erro ao buscar para {area_name}"}), 404
+    else: return jsonify({"error": "Área inválida ou não mapeada para API"}), 404
+
 
 if __name__ == '__main__':
     if not os.path.exists(METRICS_FILE_PATH):
@@ -453,7 +437,6 @@ if __name__ == '__main__':
             header = ["Carimbo de data/hora","Nome","Idade"] + ORIGINAL_QUESTION_TEXTS + ["Declaro que somente para o uso deste projeto, aceito a coleta dos dados inseridos!"]
             writer.writerow(header)
         print(f"Arquivo {CSV_FILE_PATH} criado com cabeçalho.")
-            
     monitor_thread = threading.Thread(target=start_file_monitor, daemon=True)
     monitor_thread.start()
     app.run(debug=True, use_reloader=False)

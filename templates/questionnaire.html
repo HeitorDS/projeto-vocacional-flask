@@ -1,37 +1,32 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PHV | Questionário</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='quiz.css') }}">
 </head>
-
 <body>
     <header>
-        <h1>
-            PHV Sistemas e Tecnologias
-        </h1>
-
+        <h1>PHV Sistemas e Tecnologias</h1>
         <nav>
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">Sobre a Empresa</a></li>
-                <li><a href="/redirect">Login Adm</a></li>
+                <li><a href="{{ url_for('landing') }}">Home</a></li>
+                <li><a href="{{ url_for('about') }}">Sobre a Empresa</a></li>
+                {% if admin_logged_in %}
+                    <li><a href="{{ url_for('admin_dashboard') }}">Painel Admin</a></li>
+                    <li><a href="{{ url_for('logout') }}" style="color: #dc3545;">Logout Admin</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('show_login_form') }}">Login Adm</a></li>
+                {% endif %}
             </ul>
         </nav>
-
     </header>
-
     <main>
         <div class="container">
-
-
             <h1>Responda ao Questionário Vocacional</h1>
             <p>Suas respostas nos ajudarão a identificar a área de atuação mais alinhada com seus interesses. A IA será
                 treinada com seus dados para fornecer uma recomendação.</p>
-
             <div class="form-container">
                 <form action="{{ url_for('submit_questionnaire') }}" method="POST">
                     <div class="form-row">
@@ -44,9 +39,7 @@
                             <input type="number" id="idade" name="idade" required min="10" max="100">
                         </div>
                     </div>
-
                     <h2>Perguntas de Interesse (Ordem Aleatória)</h2>
-
                     {% for question_data in questions_shuffled %}
                     <div class="question-block">
                         <p>{{ loop.index }}. {{ question_data.text }}</p>
@@ -64,15 +57,12 @@
                         </div>
                     </div>
                     {% endfor %}
-
                     <button type="submit" class="submit-btn">Enviar Respostas e Ver Recomendação</button>
                 </form>
             </div>
         </div>
     </main>
+    <footer>&copy; <b>2025, PHV</b> - Todos os direitos reservados</footer>
     <script src="{{ url_for('static', filename='modal_login.js') }}"></script> {# JavaScript para o modal #}
-    <footer>&copy; <b>PHV</b> - Todos os direitos reservados</footer>
-
 </body>
-
 </html>

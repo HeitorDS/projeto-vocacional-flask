@@ -1,23 +1,21 @@
 import pandas as pd
 import numpy as np
 import re
-import json # Para salvar as métricas
+import json
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import tensorflow as tf
-import os # Para caminhos de arquivo
+import os
 import joblib
 
-# --- Configurações ---
 CSV_FILE_PATH = 'completo.csv'
 METRICS_FILE_PATH = 'ai_metrics.json'
-SCALER_PATH = 'scaler.joblib'             # <--- NOVO
-LABEL_ENCODER_PATH = 'label_encoder.joblib' # <--- NOVO
-MODEL_SAVE_PATH = "modelo_area_interesse.keras" # <--- Mudar para o formato .keras (recomendado)
+SCALER_PATH = 'scaler.joblib'
+LABEL_ENCODER_PATH = 'label_encoder.joblib'
+MODEL_SAVE_PATH = "modelo_area_interesse.keras"
 
 RANDOM_STATE = 42
 
-# Mapeamento de interesse para peso
 interest_to_weight = {1: 0.1, 2: 0.3, 3: 0.5, 4: 0.7, 5: 0.9}
 GESTÃO_QUESTIONS_INDICES = list(range(3, 13))
 SAUDE_QUESTIONS_INDICES = list(range(13, 23))
@@ -47,11 +45,11 @@ def train_and_evaluate():
         df = pd.read_csv(CSV_FILE_PATH)
     except Exception as e:
         print(f"Erro ao ler {CSV_FILE_PATH} no script de treinamento: {e}")
-        return None, None, None, None # Adicionado para scaler e label_encoder
+        return None, None, None, None
 
     features_cols = []
     for i, idx in enumerate(ALL_QUESTION_INDICES):
-        col_name = f"q_{i+1}_weight" # q_1_weight a q_30_weight
+        col_name = f"q_{i+1}_weight"
         df[col_name] = df.iloc[:, idx].apply(get_weighted_score)
         features_cols.append(col_name)
 
@@ -64,7 +62,7 @@ def train_and_evaluate():
         return None, None, None, None
 
     y_categorical = df_filtered['target_area']
-    label_encoder = LabelEncoder() # <--- LabelEncoder
+    label_encoder = LabelEncoder()
     y_data = label_encoder.fit_transform(y_categorical)
     num_classes = len(label_encoder.classes_)
     X_data_filtered = df_filtered[features_cols].values
@@ -82,7 +80,7 @@ def train_and_evaluate():
         print("Divisão resultou em conjunto de treino ou teste vazio.")
         return None, None, None, None
 
-    scaler = StandardScaler() # <--- StandardScaler
+    scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
@@ -96,7 +94,6 @@ def train_and_evaluate():
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     
     print("Treinando o modelo...")
-    # Ajustar validation_split para evitar erro se X_train for muito pequeno
     val_split = 0.1 if len(X_train) > 10 else 0
     model.fit(X_train_scaled, y_train, epochs=50, batch_size=8, verbose=0, validation_split=val_split)
 
@@ -106,7 +103,7 @@ def train_and_evaluate():
     print(f"Treinamento concluído. Acurácia Teste: {accuracy*100:.2f}%, Perda Teste: {loss:.4f}")
 
     try:
-        model.save(MODEL_SAVE_PATH) # Salvar no formato recomendado .keras
+        model.save(MODEL_SAVE_PATH)
         print(f"Modelo salvo em {MODEL_SAVE_PATH}")
         joblib.dump(scaler, SCALER_PATH)
         print(f"Scaler salvo em {SCALER_PATH}")
@@ -133,9 +130,8 @@ def save_metrics(accuracy, loss):
     else:
         print("Treinamento falhou ou não produziu métricas, não salvando.")
 
-
 if __name__ == "__main__":
-    acc, lss, saved_scaler, saved_label_encoder = train_and_evaluate() # Capturar scaler e label_encoder
+    acc, lss, saved_scaler, saved_label_encoder = train_and_evaluate()
     if acc is not None and lss is not None:
         save_metrics(acc, lss)
     else:
