@@ -22,15 +22,21 @@ main {
 
 footer {
     text-align: center;
-    padding: 1rem;
+    padding: 20px;
+    font-size: 1.1rem;
     width: 100%;
+    background-color: #f4f1eb;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
 }
 
 header {
-    padding: 20px;
+    padding: 30px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-shrink: 0;
 }
 
 header nav ul li {
@@ -42,12 +48,16 @@ header h1 {
     font-weight: 700;
 }
 
+header nav ul {
+    display: flex;
+    gap: 1.5rem;
+}
+
 header nav ul li a {
     text-decoration: none;
     color: #333;
-    transition: color 0.3s ease;
-    color: black;
     font-weight: bold;
+    cursor: pointer;
     transition: text-decoration 0.3s ease;
 }
 

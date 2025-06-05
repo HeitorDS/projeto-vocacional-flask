@@ -1,76 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados do Questionário Vocacional e IA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <!-- Se quiser gráficos interativos, adicione bibliotecas como Chart.js aqui -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    <title>PHV | Resultados do Questionário Vocacional</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 </head>
+
 <body>
-    <div class="container">
-    <div style="text-align: right; margin-bottom: 15px;">
-        <a href="{{ url_for('logout') }}" style="color: #dc3545; text-decoration: none; font-weight: bold;">Logout Admin</a>
-    </div>
-    <h1>Análise Vocacional e Desempenho da IA</h1>
 
-        <div class="ai-summary">
-            <h2>Desempenho do Modelo de IA (Teste)</h2>
-            <p><strong>Acurácia nos dados de teste:</strong> {{ "%.2f"|format(ai_accuracy) }}%</p>
-            <p><strong>Perda (Loss) nos dados de teste:</strong> {{ "%.4f"|format(ai_loss) }}</p>
-            <p><strong>Último Treinamento da IA:</strong> {{ last_trained_timestamp if last_trained_timestamp else "Ainda não treinado / Erro" }}</p>
-            <p class="note">
-                Estes são os resultados da avaliação do modelo de Inteligência Artificial.
-                O modelo é treinado automaticamente quando o arquivo de dados do questionário é modificado.
-            </p>
-            <div class="plot-placeholder">
-                {% if grafico_modelo_url %}
-                    <img src="{{ grafico_modelo_url }}" alt="Gráfico de Acurácia e Perda do Modelo" style="max-width: 100%; height: auto;">
-                    <p class="caption">(Imagem do gráfico da última execução de treinamento da IA disponível)</p>
-                {% else %}
-                    <p class="caption">(Imagem do gráfico não disponível)</p>
-                {% endif %}
+    <header>
+        <h1>
+            PHV Sistemas e Tecnologias
+        </h1>
+
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">Sobre a Empresa</a></li>
+                <li>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </li>
+
+            </ul>
+        </nav>
+
+    </header>
+
+    <main>
+        <div class="container">
+            <h1>Análise Vocacional e Desempenho da IA</h1>
+
+            <div class="ai-summary">
+                <h2>Desempenho do Modelo de IA (Teste)</h2>
+                <p><strong>Acurácia nos dados de teste:</strong> {{ "%.2f"|format(ai_accuracy) }}%</p>
+                <p><strong>Perda (Loss) nos dados de teste:</strong> {{ "%.4f"|format(ai_loss) }}</p>
+                <p><strong>Último Treinamento da IA:</strong> {{ last_trained_timestamp if last_trained_timestamp else
+                    "Ainda não treinado / Erro" }}</p>
+                <p class="note">
+                    Estes são os resultados da avaliação do modelo de Inteligência Artificial.
+                    O modelo é treinado automaticamente quando o arquivo de dados do questionário é modificado.
+                </p>
             </div>
-        </div>
 
-        <hr>
 
-        <h2>Resultados do Questionário Vocacional (Análise Direta)</h2>
-        <p>A tabela abaixo mostra a pontuação de interesse e a área recomendada para cada participante com base em suas respostas diretas ao questionário. Estes dados são atualizados diretamente do arquivo CSV.</p>
-        
-        {% if results and results[0].get('Mensagem') %}
+            <h2>Resultados do Questionário Vocacional (Análise Direta)</h2>
+            <p>A tabela abaixo mostra a pontuação de interesse e a área recomendada para cada participante com base em
+                suas
+                respostas diretas ao questionário. Estes dados são atualizados diretamente do arquivo CSV.</p>
+
+            {% if results and results[0].get('Mensagem') %}
             <div class="error-message">
                 <h3>Erro ao Processar Dados da Análise Vocacional:</h3>
                 <p>{{ results[0].Mensagem }}</p>
             </div>
-        {% elif results %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Score Gestão</th>
-                        <th>Score Saúde</th>
-                        <th>Score TI</th>
-                        <th>Área Recomendada</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for person in results %}
-                    <tr>
-                        <td>{{ person['Nome'] }}</td>
-                        <td>{{ person['Score Gestão'] }}</td>
-                        <td>{{ person['Score Saúde'] }}</td>
-                        <td>{{ person['Score TI'] }}</td>
-                        <td class="recommended-area area-{{ person['Área Recomendada']|lower|replace(' ', '-') }}">{{ person['Área Recomendada'] }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
+            {% elif results %}
+            <div class="table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Score Gestão</th>
+                            <th>Score Saúde</th>
+                            <th>Score TI</th>
+                            <th>Área Recomendada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for person in results %}
+                        <tr>
+                            <td>{{ person['Nome'] }}</td>
+                            <td>{{ person['Score Gestão'] }}</td>
+                            <td>{{ person['Score Saúde'] }}</td>
+                            <td>{{ person['Score TI'] }}</td>
+                            <td class="recommended-area area-{{ person['Área Recomendada']|lower|replace(' ', '-') }}">
+                                {{
+                                person['Área Recomendada'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
             <p>Nenhum resultado para exibir ou erro ao carregar os dados da análise vocacional.</p>
-        {% endif %}
-    </div>
+            {% endif %}
+        </div>
+    </main>
 
     <!-- Se você adicionar Chart.js, o script para os gráficos viria aqui -->
     <!--
@@ -98,5 +114,9 @@
         // });
     </script>
     -->
+
+    <footer>&copy; <b>PHV</b> - Todos os direitos reservados</footer>
+
 </body>
+
 </html>

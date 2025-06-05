@@ -1,135 +1,118 @@
-/* static/prediction_style.css */
+* {
+    margin: 0;
+    border: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #f4f1eb;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    overflow: hidden;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 0 20px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 1.1rem;
+    width: 100%;
+    flex-shrink: 0;
+    position: fixed;
+    bottom: 0;
+    z-index: 1;
+}
+
+header {
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+header nav ul {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+header nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: text-decoration 0.3s ease;
+}
+
+header nav a:hover {
+    text-decoration: crimson wavy underline;
+}
+
+.container {
+    border: 2px solid #000;
+    padding: 40px;
+    width: 90%;
+    max-width: 900px;
+    min-width: 300px;
+    background: #fff;
+    border-radius: 6px;
+    overflow-y: scroll;
+    max-height: 800px;
+    transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s ease;
+}
+
+.container:hover {
+    box-shadow: 8px 8px rgba(0, 0, 0, 0.1);
+}
+
+.container a {
+    display: inline-block;
+    padding: 10px;
+    background: #000;
+    color: #fff;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container a:hover {
+    background: #333;
+    box-shadow: 6px 6px rgba(0, 0, 0, 0.1);
+}
 
 .result-container {
+    padding: 30px;
     text-align: center;
-    padding: 20px 30px 30px 30px; /* Adicionado padding superior menor */
 }
 
 .result-message {
     font-size: 1.5em;
-    margin-bottom: 10px; /* Reduzido margin */
-    color: #333;
+    margin-bottom: 20px;
 }
 
 .recommended-area-display {
-    font-size: 2.2em; /* Aumentado um pouco */
+    font-size: 2em;
     font-weight: bold;
-    margin-top: 5px; /* Adicionado margin-top */
-    margin-bottom: 30px; /* Aumentado margin-bottom */
-    /* A cor será definida por classes específicas como .area-ti, .area-saude, etc.,
-       que podem estar no seu style.css principal ou aqui se preferir.
-       Ex: .area-ti { color: #fd7e14; } */
 }
 
-.courses-section {
-    margin-top: 25px; /* Reduzido margin-top */
-    text-align: left;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid #e7e7e7;
-}
-
-.courses-section h3 {
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 20px;
-    color: #333;
-    font-size: 1.4em;
-}
-
-.course-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.course-item {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 12px;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease-in-out;
-}
-
-.course-item:hover {
-    transform: translateY(-3px);
-}
-
-.course-item h4 {
-    margin-top: 0;
-    margin-bottom: 8px;
-    color: #007bff;
-    font-size: 1.15em;
-}
-
-.course-item p {
-    margin-bottom: 0;
-    font-size: 0.95em;
-    color: #555;
-    line-height: 1.5;
-}
-
-.other-courses-control {
-    margin-top: 35px;
-    text-align: center;
-    padding: 20px;
-    background-color: #f0f0f0; /* Um pouco diferente para destacar */
-    border-radius: 8px;
-}
-
-.other-courses-control h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.3em;
-}
-
-.other-courses-control label {
-    margin-right: 10px;
-    font-weight: bold;
-    color: #444;
-}
-
-.other-courses-control select,
-.other-courses-control button {
-    padding: 10px 15px; /* Aumentado padding */
-    font-size: 1em;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    vertical-align: middle; /* Alinha melhor o select e botão */
-}
-
-.other-courses-control select {
-    min-width: 200px; /* Largura mínima para o select */
-}
-
-.other_courses_control button { /* Mudei para _ para consistência, mas o id é o que importa */
-    background-color: #5cb85c;
-    color: white;
-    cursor: pointer;
-    margin-left: 10px;
-    border: none; /* Remove borda padrão do botão */
-    transition: background-color 0.2s;
-}
-
-.other_courses_control button:hover {
-    background-color: #4cae4c;
-}
-
-#otherCoursesDisplay {
-    margin-top: 20px;
-    /* Herda estilos de .courses-section se necessário, ou defina específicos */
-}
-
-.loading-message, #noOtherCoursesMessage {
-    font-style: italic;
-    color: #777;
-    padding: 15px;
-    text-align: center;
-}
-
-/* Links no final da página */
 .note {
     font-size: 0.9em;
     color: #555;
@@ -138,28 +121,370 @@
 }
 
 .back-link {
-    display: inline-block;
-    margin-top: 25px;
-    padding: 10px 18px;
-    background-color: #6c757d;
-    color: white;
-    text-decoration: none;
+    margin-top: 20px;
+    padding: 10px 15px;
+    background: #6c757d;
+    color: #fff;
     border-radius: 5px;
+    text-decoration: none;
     font-size: 0.95em;
-    transition: background-color 0.2s;
-}
-.back-link:hover {
-    background-color: #5a6268;
+    transition: background 0.2s;
 }
 
-/* Mensagem de erro principal */
+.back-link:hover {
+    background: #5a6268;
+}
+
 .error-message {
-    color: #721c24 !important; /* Prioriza a cor */
+    color: #721c24;
     font-weight: bold;
-    background-color: #f8d7da;
+    background: #f8d7da;
     border: 1px solid #f5c6cb;
-    padding: 15px; /* Aumentado padding */
+    padding: 15px;
     border-radius: 5px;
-    margin: 20px auto; /* Centraliza se for um bloco */
-    max-width: 600px; /* Limita largura */
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+.courses-section {
+    margin-top: 25px;
+    padding: 20px;
+    background: #f9f9f9;
+    border: 2px solid #000;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.courses-section h3 {
+    text-align: center;
+    margin: 0 0 20px;
+    color: #333;
+    font-size: 1.4em;
+}
+
+.course-list {
+    list-style: none;
+    padding: 0;
+}
+
+.course-item {
+    background: #fff;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out;
+}
+
+.course-item:hover {
+    transform: translateY(-3px);
+}
+
+.course-item h4 {
+    margin: 0 0 8px;
+    color: #007bff;
+    font-size: 1.15em;
+}
+
+.course-item p {
+    margin: 0;
+    font-size: 0.95em;
+    color: #555;
+    line-height: 1.5;
+}
+
+.other-courses-control {
+    margin-top: 35px;
+    padding: 20px;
+    background: #f0f0f0;
+    border: 2px solid #000;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.other-courses-control h3 {
+    margin: 0 0 20px;
+    font-size: 1.3em;
+}
+
+.other-courses-control .form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.other-courses-control label {
+    font-weight: bold;
+    color: #444;
+    font-size: 1em;
+}
+
+.other-courses-control select {
+    padding: 12px 15px;
+    font-size: 1em;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    min-width: 250px;
+    max-width: 100%;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.other-courses-control select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.other-courses-control button {
+    padding: 12px 25px;
+    font-size: 1em;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    min-width: 150px;
+    font-weight: bold;
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.other-courses-control button:hover {
+    background: #3d3d3d;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.other-courses-control button:active {
+    transform: translateY(0);
+}
+
+.area-gestão {
+    color: #FF4500;
+}
+
+.area-saúde {
+    color: #228B22;
+}
+
+.area-ti {
+    color: #0000FF;
+}
+
+.area-indefinido {
+    color: #6c757d;
+}
+
+.loading-message,
+#noOtherCoursesMessage {
+    font-style: italic;
+    color: #777;
+    padding: 15px;
+    text-align: center;
+}
+
+/* Responsividade para tablets */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    header nav ul {
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .container {
+        padding: 25px;
+        width: 95%;
+        max-height: calc(100vh - 200px);
+    }
+
+    .result-container {
+        padding: 20px;
+    }
+
+    .recommended-area-display {
+        font-size: 1.6em;
+    }
+
+    .result-message {
+        font-size: 1.3em;
+    }
+
+    .other-courses-control {
+        padding: 15px;
+    }
+
+    .other-courses-control .form-group {
+        gap: 12px;
+    }
+
+    .other-courses-control select {
+        min-width: 200px;
+        padding: 10px 12px;
+    }
+
+    .other-courses-control button {
+        padding: 10px 20px;
+        min-width: 130px;
+    }
+
+    footer {
+        font-size: 1rem;
+        padding: 15px;
+    }
+}
+
+/* Responsividade para smartphones */
+@media (max-width: 480px) {
+    body{
+        overflow: auto;
+    }
+
+    main {
+        padding: 0 10px;
+        overflow: auto;
+    }
+
+    header {
+        padding: 15px;
+    }
+
+    header h1 {
+        font-size: 1.3rem;
+    }
+
+    header nav ul {
+        gap: 0.8rem;
+        flex-direction: column;
+    }
+
+    header nav a {
+        padding: 8px 12px;
+        display: block;
+        text-align: center;
+    }
+
+    footer {
+        position: relative;
+    }
+
+    .container {
+        padding: 20px;
+        width: 98%;
+        border-radius: 4px;
+        max-height: calc(100vh - 180px);
+    }
+
+    .result-container {
+        padding: 15px;
+    }
+
+    .recommended-area-display {
+        font-size: 1.4em;
+        line-height: 1.2;
+    }
+
+    .result-message {
+        font-size: 1.2em;
+    }
+
+    .courses-section {
+        padding: 15px;
+        margin-top: 20px;
+    }
+
+    .courses-section h3 {
+        font-size: 1.2em;
+    }
+
+    .course-item {
+        padding: 12px;
+    }
+
+    .other-courses-control {
+        padding: 15px;
+        margin-top: 25px;
+    }
+
+    .other-courses-control h3 {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+    }
+
+    .other-courses-control .form-group {
+        gap: 10px;
+    }
+
+    .other-courses-control select {
+        min-width: 180px;
+        width: 100%;
+        max-width: 280px;
+        padding: 10px;
+        font-size: 0.95em;
+    }
+
+    .other-courses-control button {
+        padding: 10px 15px;
+        min-width: 120px;
+        width: 100%;
+        max-width: 200px;
+        font-size: 0.95em;
+    }
+
+    .back-link {
+        padding: 10px 12px;
+        font-size: 0.9em;
+        display: block;
+        text-align: center;
+        max-width: 200px;
+        margin: 20px auto 0;
+    }
+
+    .note {
+        font-size: 0.85em;
+        margin-top: 25px;
+    }
+
+    footer {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+}
+
+/* Responsividade para telas muito pequenas */
+@media (max-width: 320px) {
+    .container {
+        padding: 15px;
+    }
+
+    .result-container {
+        padding: 10px;
+    }
+
+    .recommended-area-display {
+        font-size: 1.2em;
+    }
+
+    .other-courses-control select {
+        min-width: 150px;
+        font-size: 0.9em;
+    }
+
+    .other-courses-control button {
+        min-width: 100px;
+        font-size: 0.9em;
+    }
 }

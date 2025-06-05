@@ -11,13 +11,16 @@
 <body>
     <header>
         <h1>
-            <p>PHV</p> Sistemas e Tecnologias
+            PHV Sistemas e Tecnologias
         </h1>
         <nav>
             <ul>
-                <li><a href="/about">Sobre a empresa</a></li>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">Sobre a Empresa</a></li>
+                <li><a href="/redirect">Login Adm</a></li>
             </ul>
         </nav>
+
     </header>
 
     <main>
@@ -26,9 +29,10 @@
             <p>Descubra a sua aptidão com base nos seus interesses</p>
             <a href="/questionnaire">Descobrir Aptidão</a>
         </div>
+
     </main>
     <footer>&copy; <b>PHV</b> - Todos os direitos reservados</footer>
-    <script src="/js/main.js"></script>
+    <script src="{{ url_for('static', filename='modal_login.js') }}"></script> {# JavaScript para o modal #}
 </body>
 
 </html>

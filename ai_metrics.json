@@ -1,5 +1,5 @@
 {
-    "accuracy_test": 81.25,
-    "loss_test": 0.6061278581619263,
-    "last_trained_timestamp": "2025-06-02T00:25:30.211180"
+    "accuracy_test": 92.98245906829834,
+    "loss_test": 0.2152383029460907,
+    "last_trained_timestamp": "2025-06-04T16:32:14.847073"
 }

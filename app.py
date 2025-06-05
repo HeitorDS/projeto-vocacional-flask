@@ -18,11 +18,11 @@ import random
 import requests
 
 app = Flask(__name__)
-# app.secret_key = 'Teste321' # MUITO IMPORTANTE: Mude isso para uma chave secreta forte e aleatória!
+
 BASE_DATA_PATH = os.getenv('DATA_DIR_PATH', '.')
 app.secret_key = os.getenv('SECRET_KEY', 'Teste321')
 
-# --- Configurações e Constantes (como antes) ---
+
 CSV_FILE_PATH = os.path.join(BASE_DATA_PATH, 'completo.csv')
 METRICS_FILE_PATH = os.path.join(BASE_DATA_PATH, 'ai_metrics.json')
 SCALER_PATH = os.path.join(BASE_DATA_PATH, 'scaler.joblib')
@@ -53,7 +53,7 @@ ORIGINAL_QUESTION_TEXTS = [
     "Você tem interesse em ajudar diretamente pessoas que estão doentes, machucadas ou passando por dificuldades emocionais?",
     "Você tem interesse em seguir procedimentos e protocolos médicos ou estéticos com precisão e atenção aos detalhes para garantir a segurança e o cuidado correto?",
     "Você tem interesse em pesquisar sobre condições de saúde, tratamentos médicos, cuidados estéticos ou novas descobertas científicas na área da saúde?",
-    "Você se interessa em entender o funcionamento de procedimentos estéticos e cuidados pessoais?",
+    "Você tem interesse em entender o funcionamento de procedimentos estéticos e cuidados pessoais?",
     "Você tem interesse em desenvolver melhor suas habilidades manuais (utilizar suas mãos para realização de massagens, utilização de produtos cosméticos, etc...)?",
     "Você tem interesse em agir com calma e tomar decisões rápidas e eficazes em situações de emergência ou sob pressão?",
     "Você tem interesse em observar atentamente pequenas mudanças no estado físico, estético ou emocional de uma pessoa?",
@@ -89,7 +89,7 @@ ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', "admin")
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', "adm123")
 
 # Para a URL da API Node no app.py:
-NODE_API_BASE_URL = os.getenv('NODE_API_BASE_URL', "https://apicursos.glitch.me")
+NODE_API_BASE_URL = os.getenv('NODE_API_BASE_URL', "https://api-cursos-taupe.vercel.app")
 
 
 def extract_score_from_answer(answer_str):
@@ -231,7 +231,16 @@ def start_file_monitor():
     print("Monitor de arquivo interrompido.")
 
 # --- ROTAS DO FLASK ---
+@app.route('/about')
+def about():
+    return render_template('about.html')
+    
 @app.route('/')
+def landing():
+    return render_template('landing.html')
+
+
+@app.route('/redirect')
 def index():
     if not session.get('logged_in_admin'):
         # Se não estiver logado como admin, redireciona para o login
@@ -262,7 +271,7 @@ def show_login_form():
             flash('Login bem-sucedido como administrador!', 'success')
             return redirect(url_for('index'))
         else:
-            flash('Nome de usuário ou senha inválidos.', 'danger')
+            flash('Nome de usuário ou senha inválidos.', 'danger')  
             # Se o login falhar, permanece na página de login ou redireciona para o questionário
             return redirect(url_for('show_login_form')) # Ou redirect(url_for('show_questionnaire_form'))
     

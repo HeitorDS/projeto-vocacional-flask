@@ -1,70 +1,78 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Questionário Vocacional</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='modal_login.css') }}"> {# CSS específico do modal #}
+    <title>PHV | Questionário</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='quiz.css') }}">
 </head>
+
 <body>
-    <div class="container">
-        <div class="admin-login-button-container">
-            <button id="openLoginModalBtn" class="admin-login-btn">Login Administrador</button>
+    <header>
+        <h1>
+            PHV Sistemas e Tecnologias
+        </h1>
+
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">Sobre a Empresa</a></li>
+                <li><a href="/redirect">Login Adm</a></li>
+            </ul>
+        </nav>
+
+    </header>
+
+    <main>
+        <div class="container">
+
+
+            <h1>Responda ao Questionário Vocacional</h1>
+            <p>Suas respostas nos ajudarão a identificar a área de atuação mais alinhada com seus interesses. A IA será
+                treinada com seus dados para fornecer uma recomendação.</p>
+
+            <div class="form-container">
+                <form action="{{ url_for('submit_questionnaire') }}" method="POST">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nome">Nome Completo:</label>
+                            <input type="text" id="nome" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="idade">Idade:</label>
+                            <input type="number" id="idade" name="idade" required min="10" max="100">
+                        </div>
+                    </div>
+
+                    <h2>Perguntas de Interesse (Ordem Aleatória)</h2>
+
+                    {% for question_data in questions_shuffled %}
+                    <div class="question-block">
+                        <p>{{ loop.index }}. {{ question_data.text }}</p>
+                        <div class="options">
+                            <label><input type="radio" name="{{ question_data.id }}" value="1" required> 1- Nenhum
+                                interesse</label>
+                            <label><input type="radio" name="{{ question_data.id }}" value="2"> 2- Algum
+                                interesse</label>
+                            <label><input type="radio" name="{{ question_data.id }}" value="3"> 3- Interesse
+                                moderado</label>
+                            <label><input type="radio" name="{{ question_data.id }}" value="4"> 4- Bastante
+                                interesse</label>
+                            <label><input type="radio" name="{{ question_data.id }}" value="5"> 5- Total
+                                interesse</label>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <button type="submit" class="submit-btn">Enviar Respostas e Ver Recomendação</button>
+                </form>
+            </div>
         </div>
-
-        <h1>Responda ao Questionário Vocacional</h1>
-        <p>Suas respostas nos ajudarão a identificar a área de atuação mais alinhada com seus interesses. A IA será treinada com seus dados para fornecer uma recomendação.</p>
-
-        <form action="{{ url_for('submit_questionnaire') }}" method="POST">
-            <div class="form-group">
-                <label for="nome">Nome Completo:</label>
-                <input type="text" id="nome" name="nome" required>
-            </div>
-            <div class="form-group">
-                <label for="idade">Idade:</label>
-                <input type="number" id="idade" name="idade" required min="10" max="100">
-            </div>
-
-            <hr>
-            <h2>Perguntas de Interesse (Ordem Aleatória)</h2>
-
-            {% for question_data in questions_shuffled %}
-            <div class="question-block">
-                <p>{{ loop.index }}. {{ question_data.text }}</p>
-                <div class="options">
-                    <label><input type="radio" name="{{ question_data.id }}" value="1" required> 1- Nenhum interesse</label>
-                    <label><input type="radio" name="{{ question_data.id }}" value="2"> 2- Algum interesse</label>
-                    <label><input type="radio" name="{{ question_data.id }}" value="3"> 3- Interesse moderado</label>
-                    <label><input type="radio" name="{{ question_data.id }}" value="4"> 4- Bastante interesse</label>
-                    <label><input type="radio" name="{{ question_data.id }}" value="5"> 5- Total interesse</label>
-                </div>
-            </div>
-            {% endfor %}
-
-            <button type="submit" class="submit-btn">Enviar Respostas e Ver Recomendação</button>
-        </form>
-    </div>
-
-    <!-- O Modal de Login -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeLoginModalBtn">×</span>
-            <h2>Login do Administrador</h2>
-            <form method="POST" action="{{ url_for('show_login_form') }}">
-                <div class="modal-form-group">
-                    <label for="modal-username">Usuário:</label>
-                    <input type="text" id="modal-username" name="username" required>
-                </div>
-                <div class="modal-form-group">
-                    <label for="modal-password">Senha:</label>
-                    <input type="password" id="modal-password" name="password" required>
-                </div>
-                <button type="submit" class="modal-login-btn">Entrar</button>
-            </form>
-        </div>
-    </div>
-
+    </main>
     <script src="{{ url_for('static', filename='modal_login.js') }}"></script> {# JavaScript para o modal #}
+    <footer>&copy; <b>PHV</b> - Todos os direitos reservados</footer>
+
 </body>
+
 </html>
