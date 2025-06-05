@@ -159,7 +159,7 @@ def fetch_courses_from_api(area_endpoint_segment):
         # Garante que o segmento esteja em minúsculas, como esperado pela API Node.js
         api_url = f"{NODE_API_BASE_URL}/{area_endpoint_segment.lower()}"
         print(f"Buscando cursos de: {api_url}")
-        response = requests.get(api_url, timeout=30)
+        response = requests.get(api_url, timeout=10)
         response.raise_for_status()
         courses_data = response.json()
         print(f"Cursos recebidos para '{area_endpoint_segment}': {len(courses_data)} cursos.")
