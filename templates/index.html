@@ -38,6 +38,29 @@
                 </p>
             </div>
             <h2>Resultados do Questionário Vocacional (Análise Direta)</h2>
+
+            <form method="GET" action="{{ url_for('admin_dashboard') }}" class="filter-form">
+                <div class="form-group">
+                    <label for="filter_name">Filtrar por Nome:</label>
+                    <input type="text" id="filter_name" name="filter_name" value="{{ request.args.get('filter_name', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="filter_area">Filtrar por Área Recomendada:</label>
+                    <select id="filter_area" name="filter_area">
+                        <option value="" {% if not request.args.get('filter_area') %}selected{% endif %}>Todas as Áreas</option>
+                        <option value="TI" {% if request.args.get('filter_area') == 'TI' %}selected{% endif %}>TI</option>
+                        <option value="Saúde" {% if request.args.get('filter_area') == 'Saúde' %}selected{% endif %}>Saúde</option>
+                        <option value="Gestão" {% if request.args.get('filter_area') == 'Gestão' %}selected{% endif %}>Gestão</option>
+                       </select>
+                </div>
+                <button type="submit">Filtrar</button>
+                <a href="{{ url_for('admin_dashboard') }}" class="clear-filter-btn">Limpar Filtros</a>
+            </form>
+
+            <div class="report-buttons" style="margin-bottom: 20px; text-align: right;">
+                <a href="{{ url_for('download_csv_report') }}" class="btn btn-csv" style="padding: 8px 15px; background-color: #17a2b8; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px;">Baixar CSV</a>
+                <a href="{{ url_for('download_pdf_report') }}" class="btn btn-pdf" style="padding: 8px 15px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 4px;">Baixar PDF</a>
+            </div>
             <p>A tabela abaixo mostra a pontuação de interesse e a área recomendada para cada participante com base em
                 suas
                 respostas diretas ao questionário. Estes dados são atualizados diretamente do arquivo CSV.</p>

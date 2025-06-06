@@ -262,6 +262,92 @@ header nav ul li a:hover {
     min-width: 80px;
 }
 
+.filter-form {
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    border: 1px solid #dee2e6;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+    /* Alinha itens na parte de baixo */
+}
+
+.filter-form .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+    /* Removido margin-bottom para usar gap */
+}
+
+.filter-form label {
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 0.9em;
+    color: #495057;
+}
+
+.filter-form input[type="text"],
+.filter-form select {
+    padding: 8px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.95em;
+}
+
+.filter-form input[type="text"] {
+    min-width: 200px;
+}
+
+.filter-form select {
+    min-width: 180px;
+}
+
+.filter-form button,
+/* Estilo para o botão Filtrar existente */
+.filter-form .clear-filter-btn {
+    /* Estilo para o link Limpar Filtros */
+    padding: 8px 20px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95em;
+    height: fit-content;
+    /* Ajusta altura ao conteúdo */
+    text-decoration: none;
+    /* Remove sublinhado do link */
+    display: inline-block;
+    /* Para que padding e margin funcionem como esperado */
+    vertical-align: bottom;
+    /* Alinha com a parte de baixo dos outros inputs/botões */
+    line-height: normal;
+    /* Garante que o texto fique bem alinhado verticalmente */
+}
+
+.filter-form button {
+    /* Botão Filtrar - continua azul */
+    background-color: #007bff;
+}
+
+.filter-form button:hover {
+    background-color: #0056b3;
+}
+
+.filter-form .clear-filter-btn {
+    /* Botão Limpar Filtros - cor diferente */
+    background-color: #6c757d;
+    /* Cinza, por exemplo */
+    margin-left: 10px;
+    /* Mantém o espaçamento se necessário */
+}
+
+.filter-form .clear-filter-btn:hover {
+    background-color: #5a6268;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
     header {
