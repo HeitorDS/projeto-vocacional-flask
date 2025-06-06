@@ -109,20 +109,15 @@ def determine_target_area_and_scores_from_row(row):
         recommended_area = max(scores_dict, key=scores_dict.get)
     return score_gestao, score_saude, score_ti, recommended_area
 
-def process_survey_data(filter_name=None, filter_area=None): # Adicionados parâmetros de filtro
+def process_survey_data(filter_name=None, filter_area=None):
     processed_results = []
     try:
         if not os.path.exists(CSV_FILE_PATH):
             return [{"Nome": "Erro", "Mensagem": f"Arquivo '{CSV_FILE_PATH}' não encontrado para análise vocacional."}]
         df = pd.read_csv(CSV_FILE_PATH)
 
-        # Aplicar filtros se fornecidos
         if filter_name:
-            # iloc[:, 1] é a coluna "Nome". str.contains é case-insensitive por padrão com regex=False
             df = df[df.iloc[:, 1].astype(str).str.contains(filter_name, case=False, na=False)]
-        
-        # Para filtrar por área, primeiro precisamos calcular a área recomendada para cada linha
-        # Vamos adicionar uma coluna temporária ao DataFrame com a área recomendada
         
         temp_results_for_filtering = []
         max_expected_index = max(max(GESTÃO_QUESTIONS_INDICES_APP), max(SAUDE_QUESTIONS_INDICES_APP), max(TI_QUESTIONS_INDICES_APP))
@@ -135,9 +130,8 @@ def process_survey_data(filter_name=None, filter_area=None): # Adicionados parâ
             else:
                 score_g, score_s, score_t, rec_area = determine_target_area_and_scores_from_row(row)
             
-            # Adiciona o original_index para reter a ordem original do CSV se necessário, ou para referência
             temp_results_for_filtering.append({
-                "original_row": row, # Guardar a linha original do DataFrame
+                "original_row": row,
                 "Nome": nome, 
                 "Score Gestão": score_g, 
                 "Score Saúde": score_s, 
@@ -145,16 +139,13 @@ def process_survey_data(filter_name=None, filter_area=None): # Adicionados parâ
                 "Área Recomendada": rec_area
             })
         
-        # Aplicar filtro de área sobre os resultados processados
         if filter_area:
-            # A área recomendada pode conter "(Análise Direta)", então comparamos o início
-            # ou comparamos diretamente se o filtro for "Dados insuficientes" ou "Indefinido"
             if filter_area in ["Dados insuficientes", "Indefinido"]:
                  filtered_by_area = [
                     item for item in temp_results_for_filtering 
                     if item["Área Recomendada"] == filter_area
                 ]
-            else: # TI, Saúde, Gestão
+            else:
                 filtered_by_area = [
                     item for item in temp_results_for_filtering 
                     if item["Área Recomendada"].startswith(filter_area) 
@@ -168,7 +159,6 @@ def process_survey_data(filter_name=None, filter_area=None): # Adicionados parâ
         traceback.print_exc()
         return [{"Nome": "Erro", "Mensagem": f"Erro ao processar/filtrar CSV para análise: {e}"}]
 
-    # Retorna apenas os dicionários com os dados processados, não a 'original_row' para o template
     return [
         {k: v for k, v in item.items() if k != 'original_row'} 
         for item in processed_results
@@ -304,19 +294,16 @@ def admin_dashboard():
         flash('Por favor, faça login para acessar o painel de administrador.', 'warning')
         return redirect(url_for('show_login_form'))
     
-    # Pegar parâmetros de filtro da URL
     filter_name = request.args.get('filter_name', None)
     filter_area = request.args.get('filter_area', None)
 
-    # Se o filtro de área for uma string vazia do select, trate como None
     if filter_area == "":
         filter_area = None
         
-    print(f"DEBUG: Filtros recebidos - Nome: '{filter_name}', Área: '{filter_area}'") # Log dos filtros
+    print(f"DEBUG: Filtros recebidos - Nome: '{filter_name}', Área: '{filter_area}'")
 
     survey_results = process_survey_data(filter_name=filter_name, filter_area=filter_area)
     ai_accuracy, ai_loss, last_trained = load_ai_metrics()
-    # ... (resto da lógica como antes para gráfico_modelo_url) ...
     nome_arquivo_grafico = 'grafico_acuracia_perda_modelo.png'
     grafico_modelo_url = None
     if os.path.exists(os.path.join(app.static_folder, nome_arquivo_grafico)):
@@ -328,16 +315,14 @@ def admin_dashboard():
                            ai_loss=ai_loss,
                            last_trained_timestamp=last_trained,
                            grafico_modelo_url=grafico_modelo_url,
-                           # Passa os filtros de volta para o template preencher os campos
                            current_filter_name=filter_name,
                            current_filter_area=filter_area)
 
-def get_report_data(filter_name=None, filter_area=None): # Adicionados parâmetros de filtro
+def get_report_data(filter_name=None, filter_area=None):
     """Função auxiliar para buscar os dados do CSV para os relatórios, aplicando filtros."""
     if not os.path.exists(CSV_FILE_PATH):
         return None, ["Erro: Arquivo de dados não encontrado."]
     try:
-        # Reutiliza a função process_survey_data já com os filtros aplicados
         data_for_report = process_survey_data(filter_name=filter_name, filter_area=filter_area)
 
         if not data_for_report or (isinstance(data_for_report[0], dict) and "Mensagem" in data_for_report[0]):
@@ -375,17 +360,13 @@ def download_csv_report():
     if not header or (data_rows is None and header and "Erro" in header[0]):
         flash(header[0] if header else "Não foi possível gerar o relatório CSV.", "danger")
         return redirect(url_for('admin_dashboard'))
-    if not data_rows and header: # Se há cabeçalho mas não há dados (filtro não retornou nada)
+    if not data_rows and header:
         flash("Nenhum dado encontrado para os filtros aplicados no relatório CSV.", "info")
-        # Ainda assim, permite baixar um CSV vazio com cabeçalho ou redireciona
-        # Para este exemplo, vamos permitir baixar um CSV com apenas o cabeçalho
-        # return redirect(url_for('admin_dashboard'))
-
 
     si = io.StringIO()
     cw = csv.writer(si)
     cw.writerow(header)
-    if data_rows: # Só escreve linhas se houver dados
+    if data_rows:
         cw.writerows(data_rows)
     output = si.getvalue()
     
@@ -424,16 +405,10 @@ class PDF(FPDF):
         self.set_font('Arial', '', 8)
         for row in data:
             for i, item in enumerate(row):
-                # Tratar caracteres especiais para PDF (latin-1)
-                # A biblioteca FPDF2 por padrão usa 'latin-1' (ISO-8859-1) se não especificar outra codificação
-                # ao adicionar fontes unicode. Se seus dados podem ter caracteres fora do latin-1,
-                # você precisaria configurar o FPDF2 para usar UTF-8 (adicionando uma fonte TTF que suporte unicode).
-                # Para uma solução simples agora, vamos tentar converter para string e deixar o FPDF lidar com isso
-                # ou, se necessário, codificar e decodificar para latin-1 com tratamento de erro.
                 try:
                     cell_text = str(item).encode('latin-1', 'replace').decode('latin-1')
                 except UnicodeEncodeError:
-                    cell_text = str(item).encode('ascii', 'replace').decode('ascii') # Fallback mais seguro
+                    cell_text = str(item).encode('ascii', 'replace').decode('ascii')
                 self.cell(col_widths[i], 6, cell_text, 1)
             self.ln()
 
@@ -453,16 +428,14 @@ def download_pdf_report():
         return redirect(url_for('admin_dashboard'))
     if not data_rows and header:
         flash("Nenhum dado encontrado para os filtros aplicados no relatório PDF.", "info")
-        # Poderia gerar um PDF com "Nenhum dado" ou redirecionar
-        # Para este exemplo, redireciona
         return redirect(url_for('admin_dashboard'))
 
 
     pdf = PDF(orientation='P', unit='mm', format='A4') 
     pdf.add_page()
-    if data_rows: # Só desenha a tabela se houver dados
+    if data_rows:
         pdf.chapter_body(header, data_rows)
-    else: # Caso contrário, apenas o título e uma mensagem
+    else:
         pdf.chapter_title("Relatório de Aptidão Vocacional")
         pdf.set_font('Arial', '', 10)
         pdf.cell(0, 10, "Nenhum dado encontrado para os filtros aplicados.", 0, 1, 'C')
@@ -474,7 +447,6 @@ def download_pdf_report():
     return Response(pdf_output_bytes,
                     mimetype='application/pdf',
                     headers={'Content-Disposition': 'attachment;filename=relatorio_aptidao_filtrado.pdf'})
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def show_login_form():
