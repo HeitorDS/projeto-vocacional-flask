@@ -82,7 +82,7 @@ TI_QUESTIONS_INDICES_APP = list(range(23, 33))
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', "admin")
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', "adm123")
 
-NODE_API_BASE_URL = os.getenv('NODE_API_BASE_URL', "https://api-cursos-taupe.vercel.app")
+NODE_API_BASE_URL = os.getenv('NODE_API_BASE_URL', "https://apicursos.glitch.me")
 
 def extract_score_from_answer(answer_str):
     if pd.isna(answer_str) or not isinstance(answer_str, str): return None
