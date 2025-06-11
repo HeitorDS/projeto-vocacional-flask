@@ -1,4 +1,3 @@
-// static/prediction_scripts.js
 document.addEventListener('DOMContentLoaded', function () {
     const loadOtherCoursesBtn = document.getElementById('loadOtherCoursesBtn');
     const areaSelector = document.getElementById('areaSelector');
@@ -8,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const noOtherCoursesMessage = document.getElementById('noOtherCoursesMessage');
     const loadingOtherCourses = document.getElementById('loadingOtherCourses');
 
-    // Event listener para carregar outros cursos
     if (loadOtherCoursesBtn && areaSelector && otherCoursesDisplay && otherCoursesList && otherCoursesTitle && noOtherCoursesMessage && loadingOtherCourses) {
         loadOtherCoursesBtn.onclick = function () {
             const selectedArea = areaSelector.value;
@@ -19,14 +17,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            // Prepara a UI para carregar
             otherCoursesList.innerHTML = '';
             otherCoursesTitle.textContent = '';
             noOtherCoursesMessage.style.display = 'none';
             loadingOtherCourses.style.display = 'block';
             otherCoursesDisplay.style.display = 'block';
 
-            // Faz a requisição para a API Flask
             fetch(`/api/courses/${selectedArea}`)
                 .then(response => {
                     if (!response.ok) {
@@ -62,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function () {
         console.warn("Um ou mais elementos para carregar outros cursos não foram encontrados no DOM.");
     }
 
-    // Função simples para escapar HTML e prevenir XSS básico
     function escapeHtml(unsafe) {
         if (typeof unsafe !== 'string') {
             return unsafe;
@@ -75,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    // Função para lidar com o clique no curso (ÚNICA VERSÃO)
     function handleCourseClick(event) {
         const courseItem = event.currentTarget;
         const description = courseItem.querySelector('p');
@@ -83,7 +77,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (description) {
             // Toggle da descrição
             if (description.style.display === 'none' || description.style.display === '') {
-                // Mostra a descrição
                 description.style.display = 'block';
                 description.style.marginTop = '10px';
                 description.style.padding = '10px';
@@ -92,16 +85,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 description.style.borderRadius = '4px';
                 description.style.animation = 'fadeIn 0.3s ease-in';
 
-                // Adiciona ícone de "expandido"
                 const title = courseItem.querySelector('h4');
                 if (title && !title.textContent.includes('▼')) {
                     title.textContent = title.textContent.replace('▶', '') + ' ▼';
                 }
             } else {
-                // Oculta a descrição
                 description.style.display = 'none';
 
-                // Adiciona ícone de "fechado"
                 const title = courseItem.querySelector('h4');
                 if (title) {
                     title.textContent = title.textContent.replace('▼', '') + ' ▶';
@@ -110,21 +100,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Função para adicionar evento de clique aos cursos
     function addClickEventsToCourses() {
         const courseItems = document.querySelectorAll('.course-item');
 
         courseItems.forEach(item => {
-            // Remove listeners antigos para evitar duplicação
             item.removeEventListener('click', handleCourseClick);
-            // Adiciona o novo listener
             item.addEventListener('click', handleCourseClick);
 
-            // Adiciona estilo visual para indicar que é clicável
             item.style.cursor = 'pointer';
             item.style.transition = 'all 0.3s ease';
 
-            // Efeitos hover
             item.addEventListener('mouseenter', function () {
                 this.style.backgroundColor = '#f0f8ff';
                 this.style.transform = 'translateY(-2px)';
@@ -139,7 +124,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Adiciona ícones visuais aos títulos dos cursos
     function addExpandIcons() {
         const courseTitles = document.querySelectorAll('.course-item h4');
         courseTitles.forEach(title => {
@@ -150,7 +134,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Função para exibir os cursos carregados (CORRIGIDA)
     function displayOtherCourses(courses) {
         otherCoursesList.innerHTML = '';
 
@@ -164,20 +147,17 @@ document.addEventListener('DOMContentLoaded', function () {
             otherCoursesList.appendChild(li);
         });
 
-        // IMPORTANTE: Adiciona eventos de clique aos novos cursos
         addClickEventsToCourses();
         addExpandIcons();
     }
 
 
-    // Inicializa os eventos para cursos já carregados na página
     addClickEventsToCourses();
     addExpandIcons();
 
 
 });
 
-// CSS adicional via JavaScript
 const style = document.createElement('style');
 style.textContent = `
     @keyframes fadeIn {

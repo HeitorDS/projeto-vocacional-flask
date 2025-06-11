@@ -7,17 +7,20 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='prediction_style.css') }}">
 </head>
 <body>
-    <header>
-        <h1>PHV Sistemas e Tecnologias</h1>
+      <header>
+        <a style="align-items: center; flex-direction: row; display: flex; text-decoration: none; color: black;" href="{{url_for('landing')}}">
+            <img src="/static/Logotipo.svg" style="max-width: 40px; max-height: 40px;">
+            <h1>Sistemas e Tecnologias</h1>
+        </a>
         <nav>
             <ul>
                 <li><a href="{{ url_for('landing') }}">Home</a></li>
                 <li><a href="{{ url_for('about') }}">Sobre a Empresa</a></li>
                 {% if admin_logged_in %}
-                    <li><a href="{{ url_for('admin_dashboard') }}">Painel Admin</a></li>
-                    <li><a href="{{ url_for('logout') }}" style="color: #dc3545;">Logout Admin</a></li>
+                <li><a href="{{ url_for('admin_dashboard') }}">Painel Admin</a></li>
+                <li><a href="{{ url_for('logout') }}" style="color: #dc3545;">Logout Admin</a></li>
                 {% else %}
-                    <li><a href="{{ url_for('show_login_form') }}">Login Adm</a></li>
+                <li><a href="{{ url_for('show_login_form') }}">Login Adm</a></li>
                 {% endif %}
             </ul>
         </nav>

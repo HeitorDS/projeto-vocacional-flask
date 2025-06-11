@@ -7,8 +7,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='about.css') }}">
 </head>
 <body>
-    <header>
-        <h1><img src="/static/Logotipo.svg" alt=""> Sistemas e Tecnologias</h1>
+  <header>
+        <a style="align-items: center; flex-direction: row; display: flex; text-decoration: none; color: black;" href="{{url_for('landing')}}">
+            <img src="/static/Logotipo.svg" style="max-width: 40px; max-height: 40px;">
+            <h1>Sistemas e Tecnologias</h1>
+        </a>
         <nav>
             <ul>
                 <li><a href="{{ url_for('landing') }}">Home</a></li>
